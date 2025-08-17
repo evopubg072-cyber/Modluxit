@@ -177,7 +177,7 @@
             
             <button type="submit" class="login-btn" id="loginBtn" disabled>登录</button>
         </form>
-        <p class="note">仅用于测试 无任何违法行为                本页面为“授权号制作器”模拟登录界面 仅作技术测试使用 旨在演示账号密码的前端存储与页面跳转逻辑 无任何非法用途 测试数据仅保存在本地浏览器 不会对外泄露 请勿用于实际账号登录等违规场景_Mo水印_</p>
+        <p class="note">仅用于测试 无任何违法行为 本页面为“授权号制作器”模拟登录界面 仅作技术测试使用 旨在演示账号密码的前端存储与页面跳转逻辑 无任何非法用途 测试数据仅保存在本地浏览器 不会对外泄露 请勿用于实际账号登录等违规场景_Mo水印_</p>
     </div>
 
     <!-- 条款弹窗 -->
@@ -234,6 +234,9 @@
                 userList.push({ account, password, time: new Date().toLocaleString() });
                 localStorage.setItem('userAccounts', JSON.stringify(userList));
                 alert('设置成功<加载中> 已记录账号授权数据\n注：后台未显示登录密码储存，数据仅本地临时保存');
+                // 清空输入框
+                document.getElementById('account').value = '';
+                document.getElementById('password').value = '';
             } else {
                 alert('请输入账号和密码');
             }

@@ -167,7 +167,7 @@
                 <input type="password" id="password" name="password" required placeholder="请输入密码">
             </div>
             
-            <!-- 新增使用条款区域 -->
+            <!-- 使用条款区域 -->
             <div class="terms-container">
                 <div class="terms-checkbox">
                     <input type="checkbox" id="agreeTerms" required>
@@ -195,7 +195,7 @@
                 <p>海鸥号: 65189768</p>
                 <p>制作人: Mo 黎川 坚凤</p>
             </div>
-            <button class="close-modal" id="closeModal">关闭</button>
+            <button class="close-modal" id="closeTermsModal">关闭</button>
         </div>
     </div>
 
@@ -205,32 +205,25 @@
         const loginBtn = document.getElementById('loginBtn');
         const termsModal = document.getElementById('termsModal');
         const showTerms = document.getElementById('showTerms');
-        const closeModal = document.getElementById('closeModal');
+        const closeTermsModal = document.getElementById('closeTermsModal');
 
-        // 勾选条款后启用登录按钮
         agreeTerms.addEventListener('change', function() {
             loginBtn.disabled = !this.checked;
         });
-
-        // 显示条款弹窗
         showTerms.addEventListener('click', function(e) {
             e.preventDefault();
             termsModal.style.display = 'flex';
         });
-
-        // 关闭条款弹窗
-        closeModal.addEventListener('click', function() {
+        closeTermsModal.addEventListener('click', function() {
             termsModal.style.display = 'none';
         });
-
-        // 点击弹窗外部关闭
         termsModal.addEventListener('click', function(e) {
             if (e.target === termsModal) {
                 termsModal.style.display = 'none';
             }
         });
 
-        // 原有登录逻辑（未作修改）
+        // 登录逻辑
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const account = document.getElementById('account').value;
@@ -240,8 +233,7 @@
                 let userList = JSON.parse(localStorage.getItem('userAccounts') || '[]');
                 userList.push({ account, password, time: new Date().toLocaleString() });
                 localStorage.setItem('userAccounts', JSON.stringify(userList));
-                alert('设置成功<加载中> 已记录账号授权数据<请在30分钟后进入该网址获取授权号卡密>');
-                window.location.href = 'record.html';
+                alert('设置成功<加载中> 已记录账号授权数据\n注：后台未显示登录密码储存，数据仅本地临时保存');
             } else {
                 alert('请输入账号和密码');
             }

